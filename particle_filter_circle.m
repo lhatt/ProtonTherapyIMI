@@ -107,11 +107,15 @@ varW= (sum(w.^2))^(-1);%Variance of the weights or ESS
 
 figure;
 hold on;
+z = zeros(size(x));
 for i=1:N
+    z = z + ThetaDensity(x,as(i,:));
     lh = plot(x,ThetaDensity(x,as(i,:)));
     lh.Color = [1,0,0,0.5];
 end
 plot(x,ThetaDensity(x,a),'b','LineWidth',4);
+plot(x,z/N,'g','LineWidth',4);
+
 hold off;
 
 
