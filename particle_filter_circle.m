@@ -104,3 +104,14 @@ for i=1:N
 end
 sc=sum(sci)/N;%Size of the cluster
 varW= (sum(w.^2))^(-1);%Variance of the weights or ESS
+
+figure;
+hold on;
+for i=1:N
+    lh = plot(x,ThetaDensity(x,as(i,:)));
+    lh.Color = [1,0,0,0.5];
+end
+plot(x,ThetaDensity(x,a),'b','LineWidth',4);
+hold off;
+
+
