@@ -8,10 +8,13 @@
 clear all;
 N=1000;%No. of particles
 k=3;%Length of summary statistic
-ndp=500;%No. of data points observed per iteration
-m=5;%No. of total iterations
+ndp=5000;%No. of data points observed per iteration
+m=10;%No. of total iterations
 AM_start=2;%When to introduce adaptive normal distribution in mutation step
            %Set AM_start>m for a fixed covariance matrix 
+           
+% Set to true to plot particl positions at every step:
+plot_cloud = false;
 
 % Find the true statistic
 a=sum_stat(k);
@@ -34,14 +37,21 @@ for i=1:N
     as(i,:)=sum_stat(k);
 end
 %Plot the particles in state space
-plot_particles(as,a);
+if plot_cloud
+    plot_particles(as,a);
+end
 
 % Initialise the covariance matrix
 for i=1:N
-    CV{i}=eye(k)*.01;
+    CV{i}=eye(k)*.1;
 end
 sum_states=as';
 
+% Setup matrix to store average distribution after each resampling
+av_p = zeros(m,length(x));
+
+% Vector to plot l2 distance of particle filter p to truth
+l2_p = zeros(m,1);
 
 % Introduce ndp data points per cycle
 for j=1:m
@@ -55,8 +65,16 @@ for j=1:m
     
     % Resample n particles according to the weights
     as_w=datasample(as,N,'Weights',w);
-    plot_particles(as_w,a);
-     
+    if plot_cloud
+        plot_particles(as_w,a);
+    end
+    
+    for i=1:N
+        av_p(j,:) = av_p(j,:) + w(i)*ThetaDensity(x,as(i,:));
+    end    
+    
+    l2_p(j) = (av_p(j,:)-p)*(av_p(j,:)-p)';
+    
    % Mutation step
     clear as_m;
     acc_count=0;
@@ -118,4 +136,5 @@ plot(x,z/N,'g','LineWidth',4);
 
 hold off;
 
+plot(1:m,log(l2_p));
 
