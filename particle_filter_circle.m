@@ -8,13 +8,13 @@
 clear all;
 N=1000;%No. of particles
 k=3;%Length of summary statistic
-ndp=5000;%No. of data points observed per iteration
-m=10;%No. of total iterations
+ndp=2000;%No. of data points observed per iteration
+m=15;%No. of total iterations
 AM_start=2;%When to introduce adaptive normal distribution in mutation step
            %Set AM_start>m for a fixed covariance matrix 
            
 % Set to true to plot particl positions at every step:
-plot_cloud = false;
+plot_cloud = true;
 
 % Find the true statistic
 a=sum_stat(k);
@@ -135,6 +135,6 @@ plot(x,ThetaDensity(x,a),'b','LineWidth',4);
 plot(x,z/N,'g','LineWidth',4);
 
 hold off;
-
+figure;
 plot(1:m,log(l2_p));
 
