@@ -46,9 +46,8 @@ if plot_cloud
     plot_particles(as,a);
 end
 
-% Initialise the covariance matrix
+% Initialise the covariance matrix for mutation step
 CV0=eye(k)*(.01/k);
-sd=(2.38^2)/k;
 
 % Setup matrix to store average 
 av_as = zeros(m,length(a));
