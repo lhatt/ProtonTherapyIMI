@@ -5,9 +5,9 @@
 % mutation step applies the Metropolis-Hastings method. 
 
 clear all;
-N=100;%No. of particles
+N=200;%No. of particles
 ndp=1000;%No. of data points observed
-m=50;%No. of iterations
+m=30;%No. of iterations
 h=0.2; %vertical distance from gamma particle origin (x) to detector 
 no_b=6;%no. of bins/compartments for angle ranges
 global max_iterations
@@ -29,7 +29,7 @@ k=length(a);% length of true statistic
 mean_a=mean(a);% mean of true statistic
 stda=std(a);% s.d. of true statistic
 %Observation data- True dose profile/prob. distn for x
-[xs,PxT]=Gdetector(d1,d2,d3);
+[xs,PxT]=DoseProfile(d1,d2,d3);
 %Calculate probability distribution P(xd)- split into no_b bins
 %Each bin represents a different angle range
 PTs=Prob_xd_bins(xs,PxT,h,no_b);
@@ -81,7 +81,7 @@ for j=1:m
     j
     for i=1:N
         % Dose profile corresponding to particle i
-        [xs,Px]=Gdetector(as(i,1),as(i,2),as(i,3));
+        [xs,Px]=DoseProfile(as(i,1),as(i,2),as(i,3));
         Pis=Prob_xd_bins(xs,Px,h,no_b); % P(xd) split into no_b bins by angle range
         wgt=0;
         % Use Log to avoid underflow
@@ -121,8 +121,8 @@ for j=1:m
         
         % Find the distributions of the past and new state
 
-        [xs1,Px1]=Gdetector(a1(1),a1(2),a1(3));%dose profile past state
-        [xs2,Px2]=Gdetector(a2(1),a2(2),a2(3));%dose profile new state
+        [xs1,Px1]=DoseProfile(a1(1),a1(2),a1(3));%dose profile past state
+        [xs2,Px2]=DoseProfile(a2(1),a2(2),a2(3));%dose profile new state
 
         Pi1s=Prob_xd_bins(xs1,Px1,h,no_b);
         Pi2s=Prob_xd_bins(xs2,Px2,h,no_b);
