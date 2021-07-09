@@ -13,7 +13,7 @@ global prob_data
 domain = 'square_all_dirichlet';
 
 % initial global refinements
-global_refinements = 2;
+global_refinements = 10;
 
 prob_data.f = inline('f_poly(x)','x ');
 
@@ -45,7 +45,7 @@ adapt.C(2) = 1.0;
 adapt.tolerance = 1e-5;
 
 % maximum number of iterations of adaptive strategy
-adapt.max_iterations = 5;
+%adapt.max_iterations = 5;
 
 % marking_strategy, possible options are
 % GR: global (uniform) refinement,  
