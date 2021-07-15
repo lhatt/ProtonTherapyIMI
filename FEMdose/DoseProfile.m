@@ -98,5 +98,5 @@ uh];
 index=find(XYZ(:,2)==0.5);
 XYZ_det=XYZ(index,:);
 
-x=0:.0001:1;
+x=0:.01:1;
 y=interp1(XYZ_det(:,1),XYZ_det(:,3),x);
