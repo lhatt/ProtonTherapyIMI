@@ -10,15 +10,11 @@ thetas=-pi/2:dth:pi/2;%different angle ranges
 for i=1:length(xds)
     xd=xds(i);
     %Compute P(x and xd) and then average over x to find P(xd)
-    int=0;
-    for j=1:length(xs)
-        x=xs(j);
-        
-        Pxd_x=(1/(2*pi))*(atan((xd+dx-x)/h)-atan((xd-x)/h));%P(xd|x)
-        Px=Prx(j);%P(x)
-        theta(j)=atan((xd-x)/h);% angle given xd and x
-        intj(j)=Pxd_x*Px*dx;% averaging over x
-    end
+    Pxd_x=(1/(2*pi))*(atan((xd+dx-xs)/h)-atan((xd-xs)/h));%P(xd|x)
+    intj=dx*(Pxd_x.*Prx);
+    
+    theta=atan((xd-xs)/h);% angle given xd and x
+    
     % Distribute each theta into the appropriate bin
     for j=1:no_b
         ind{j}=find((theta>=thetas(j)).*(theta<thetas(j+1)));
@@ -30,6 +26,7 @@ for i=1:length(xds)
     P(j+1,i)=sum(intj);% P(xd)
     
 end
+
 %Ensure there are no small negative values
 for j=1:no_b+1
     pj=P(j,:);

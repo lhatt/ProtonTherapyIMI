@@ -2,11 +2,10 @@
 % For a given dose profile, we estimate the 3 diffusion coefficients 
 % within each region.
 % A particle filter algorithm is used to solve this inverse problem. The 
-% mutation step applies the Metropolis-Hastings method, with the option of
-% applying the Adaptive Metropolis technique.
+% mutation step applies the Metropolis-Hastings method. 
 
 clear all;
-N=100;%No. of particles
+N=20;%No. of particles
 ndp=1000;%No. of data points observed
 m=30;%No. of iterations
 h=0.2; %vertical distance from gamma particle origin (x) to detector 
@@ -17,7 +16,7 @@ no_b=6;%no. of bins/compartments for angle ranges
 % Set to true to plot particle positions at every step:
 plot_cloud = false;
 
-% Set to true if using adaptive covariance matrix for mutation step
+% Set to true if using adaptive covariance matrix for mutation
 AM = false;
 
 % Find the true statistic
@@ -64,6 +63,10 @@ for i=1:N
     as(i,:)=part;
 end
 
+%Plot the particles in state space
+if plot_cloud
+    plot_particles(as,a);
+end
 
 % Initialise the covariance matrix
 CV0=eye(k)*(.01/k);
@@ -87,7 +90,7 @@ l2_p = zeros(m,1);
 for j=1:m
     % Calculate the importance weights using the likelihood function and
     % the observations
-    clear w dp;
+    clear w;
     j
     for i=1:N
         % Dose profile corresponding to particle i
