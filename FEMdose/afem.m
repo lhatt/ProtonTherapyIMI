@@ -54,11 +54,6 @@ iter_counter = 1;
 % Assemble and solve the system matrix
 [t] = assemble_and_solve(d1,d2,d3);
 
-fprintf(1,'n_dofs: %5d\n',mesh.n_vertices);
-fprintf(1,'n_elements: %5d\n',mesh.n_elem);
-fprintf(1,'Assemble/solve computational time[s]: %.2f \n',t);
-
-
 % Calls the output script
 output
 
