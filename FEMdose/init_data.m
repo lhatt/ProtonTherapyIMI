@@ -13,7 +13,7 @@ global prob_data
 domain = 'square_all_dirichlet';
 
 % initial global refinements
-global_refinements = 3;
+global_refinements = 10;
 
 prob_data.f = inline('f_poly(x)','x ');
 

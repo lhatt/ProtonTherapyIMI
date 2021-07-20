@@ -6,13 +6,13 @@
 % applying the Adaptive Metropolis technique.
 
 clear all;
-N = 100;%No. of particles
+N = 200;%No. of particles
 ndp = 1000;%No. of data points observed
-m = 20;%No. of iterations
+m = 10;%No. of iterations
 h = 0.2; %vertical distance from gamma particle origin (x) to detector 
 no_b=6;%no. of bins/compartments for angle ranges
-% global max_iterations
-% max_iterations = 4;
+global max_iterations
+max_iterations = 4;
 
 id = datestr(now,'yymmddHHMMSS');
 dir = 'output/';
@@ -25,10 +25,10 @@ diary(filename_diary)
 diary on
 
 % Set to true to plot particle positions at every step:
-plot_cloud = false;
+plot_cloud = true;
 
 % Set to true if using adaptive covariance matrix for mutation step
-AM = false;
+AM = true;
 
 % Find the true statistic
 %Divide the domain into 3 chunks
@@ -119,11 +119,13 @@ av_as = zeros(m,length(a));
 % Vector to plot l2 distance of particle filter to truth
 l2_p = zeros(m,1);
 
+% Initialise dose profile vector
+dp = zeros(N,length(xs))-2; % Will be negative if not initialised.
 
 for j=1:m
     % Calculate the importance weights using the likelihood function and
     % the observations
-    clear w dp;
+    
     j
     
     % Compute log_weight of truth as a normalising constant
@@ -138,9 +140,17 @@ for j=1:m
     
     for i=1:N
         % Dose profile corresponding to particle i
-        [xs,Px]=DoseProfile(as(i,1),as(i,2),as(i,3));
-        dp(i,:)=Px;
-        Pis=Prob_xd_bins(xs,Px,h,no_b); % P(xd) split into no_b bins by angle range
+         if dp(i,1) < -1
+             [xs,Px]=DoseProfile(as(i,1),as(i,2),as(i,3));
+             dp(i,:)=Px;
+         else
+             [xs,Px]=DoseProfile(as(i,1),as(i,2),as(i,3));             
+         end
+        if dp(i,:)~=Px
+            disp(as(i,:))
+            dp(i,:) = Px
+        end
+        Pis=Prob_xd_bins(xs,dp(i,:),h,no_b); % P(xd) split into no_b bins by angle range
 
         wgt=0;
         % Use Log to avoid underflow
@@ -156,7 +166,7 @@ for j=1:m
             %fig2 = 
             subplot(3,2,kk);
             hold on;
-            plot(xds,Pis(kk,:),'Color',[1, 0, 0, 0.4])
+            plot(xds,Pis(kk,:),'Color',[1, 0, 0, 0.4],'LineWidth',5)
         end
     end
     
@@ -165,7 +175,7 @@ for j=1:m
         %fig2 = 
         subplot(3,2,kk);
         hold on;
-        plot(xds,PTs(kk,:),'Color',[0, 0.4, 1, 1])
+        plot(xds,PTs(kk,:),'Color',[0, 0.4, 1, 1],'LineWidth',10)
     end
     
     filepath = char(strcat(dir,id,'Pred',string(j)));
@@ -173,26 +183,43 @@ for j=1:m
     saveas(fig,filepath,'epsc');
     hold off;
     
+    fig = figure('Visible','off');
+    hold on;
+    for kk = 1:N
+        plot(xs,dp(kk,:),'Color',[0.4, 0, 0.2, 0.4],'LineWidth',5)
+    end
+    plot(xs,PxT,'Color',[0, 1, 0, 1],'LineWidth',10)
+
+    filepath = char(strcat(dir,id,'Prof',string(j)));
+    
+    saveas(fig,filepath,'epsc');
+    hold off;
+
     log_wt(j) = log(sum(w)/N)+wgt_normalise;
     % display(w)
     w=w/sum(w);% Normalise the weights
-    % Resample n particles according to the weights
-    as_w=datasample(as,N,'Weights',w);
-
-        
     
+    % Resample n particles according to the weights
+    perm = datasample(1:N,N,'Weights',w); % Setup permutation
+    as_w=as(perm,:);
+    dp = dp(perm,:);
 
     % Plot particle cloud
     if plot_cloud
+        fig = figure('Visible','off');
         plot_particles(as_w,a);
+        
+        filepath = char(strcat(dir,id,'Part',string(j)));
+        saveas(fig,char(filepath),'epsc');
     end
     %Calculating the expected value for a
     for i=1:N
         av_as(j,:)=av_as(j,:)+ w(i)*as(i,:);
     end    
     % Calculate the L2 error
-    l2_p(j) = (av_as(j,:)-a)*(av_as(j,:)-a)'
-    av_as(j,:)
+    l2_p(j) = (av_as(j,:)-a)*(av_as(j,:)-a)';
+    disp(l2_p(j))
+    disp(av_as(j,:))
    % Mutation step
     clear as_m;
     for i=1:N
@@ -214,7 +241,7 @@ for j=1:m
             else
                 a2=mvnrnd(as_w(i,:),CV0,1);
             end
-            a2=mvnrnd(as_w(i,:),CV0,1);
+            % a2=mvnrnd(as_w(i,:),CV0,1);
         end
         a1=as_w(i,:); % past step
         
@@ -245,6 +272,7 @@ for j=1:m
         
         if as_m(i,:) == a2
             accept_MH(j) = accept_MH(j) + 1; % Count if we accepted
+            dp(i,:) = Px2; % Update stored profile
         end
         
     end      
