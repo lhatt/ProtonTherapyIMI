@@ -5,9 +5,9 @@
 % mutation step applies the Metropolis-Hastings method. 
 
 clear all;
-N = 200;%No. of particles
+N = 10;%No. of particles
 ndp = 1000;%No. of data points observed
-m=40;%No. of iterations
+m=2;%No. of iterations
 h=0.2; %vertical distance from gamma particle origin (x) to detector 
 no_b=6;%no. of bins/compartments for angle ranges
 global max_iterations
@@ -15,6 +15,13 @@ max_iterations = 4;
 
 id = datestr(now,'yymmddHHMMSS');
 dir = 'output/';
+
+filename_diary = strcat(id,'Diary.txt');
+
+timerVal = tic;
+
+diary(filename_diary)
+diary on
 
 % Set to true to plot particle positions at every step:
 plot_cloud = false;
@@ -89,7 +96,7 @@ if plot_cloud
 end
 
 % Initialise the covariance matrix
-CV0=eye(k)*(.01/k);
+CV0=eye(k)*(.05/k);
 
 % Setup matrix to store average 
 av_as = zeros(m,length(a));
@@ -249,3 +256,9 @@ grid on;
 filepath = char(strcat(dir,id,'weight'));
 
 saveas(fig,filepath,'epsc');
+
+toc(timerVal)
+
+diary off
+movefile(filename_diary,dir)
+

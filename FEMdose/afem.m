@@ -51,42 +51,13 @@ err_H1_old = -1.0;
 est_old = -1.0;
 iter_counter = 1;
 
-while (1)
-    
-    % Assemble and solve the system matrix
-    [t] = assemble_and_solve(d1,d2,d3);
+% Assemble and solve the system matrix
+[t] = assemble_and_solve(d1,d2,d3);
         
-    est(iter_counter) = estimate(prob_data, adapt);
 
-    err_H1(iter_counter) = H1_err(mesh.elem_vertices, mesh.vertex_coordinates, uh, prob_data.grd_u_exact);
-
-    ndof(iter_counter) = mesh.n_vertices;
-    
-    if err_H1_old < 0
-        EOC_H1(iter_counter) = 0;
-        EOC_est(iter_counter) = 0;
-    else
-        EOC_H1(iter_counter) = log(err_H1_old / err_H1(iter_counter) ) / log(2);
-        EOC_est(iter_counter) = log(est_old / est(iter_counter) ) / log(2);
-    end
-    
-    fprintf(1,'n_dofs: %5d\n',mesh.n_vertices);
-    fprintf(1,'n_elements: %5d\n',mesh.n_elem);
-    fprintf(1,'Assemble/solve computational time[s]: %.2f \n',t);
-
-    err_H1_old = err_H1(iter_counter);
-    est_old = est(iter_counter);
-    
-    if ((iter_counter >= adapt.max_iterations) || (est(iter_counter) < adapt.tolerance))
-        break;
-    else
-        mark_elements(adapt);
-        refine_mesh;
-    end
-    
-    iter_counter = iter_counter + 1;
-    
-end
+fprintf(1,'n_dofs: %5d\n',mesh.n_vertices);
+fprintf(1,'n_elements: %5d\n',mesh.n_elem);
+fprintf(1,'Assemble/solve computational time[s]: %.2f \n',t);
 
 % Calls the output script
 output
