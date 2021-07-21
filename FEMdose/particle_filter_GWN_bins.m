@@ -8,7 +8,7 @@
 clear all;
 N = 200;%No. of particles
 ndp = 1000;%No. of data points observed
-m = 10;%No. of iterations
+m = 20;%No. of iterations
 h = 0.2; %vertical distance from gamma particle origin (x) to detector 
 no_b=6;%no. of bins/compartments for angle ranges
 global max_iterations
@@ -119,6 +119,13 @@ av_as = zeros(m,length(a));
 % Vector to plot l2 distance of particle filter to truth
 l2_p = zeros(m,1);
 
+% To store weight of particles after each iteration. A basic measure of how
+% well the particles are predicting the outcomes.
+log_wt = zeros(m,1);
+
+% Vector to store the MSE
+mse = zeros(m,1);
+
 % Initialise dose profile vector
 dp = zeros(N,length(xs))-2; % Will be negative if not initialised.
 
@@ -166,7 +173,7 @@ for j=1:m
             %fig2 = 
             subplot(3,2,kk);
             hold on;
-            plot(xds,Pis(kk,:),'Color',[1, 0, 0, 0.4],'LineWidth',5)
+            plot(xds,Pis(kk,:),'Color',[1, 0, 0, 0.4],'LineWidth',1)
         end
     end
     
@@ -175,7 +182,7 @@ for j=1:m
         %fig2 = 
         subplot(3,2,kk);
         hold on;
-        plot(xds,PTs(kk,:),'Color',[0, 0.4, 1, 1],'LineWidth',10)
+        plot(xds,PTs(kk,:),'Color',[0, 0.4, 1, 1],'LineWidth',2)
     end
     
     filepath = char(strcat(dir,id,'Pred',string(j)));
@@ -186,9 +193,9 @@ for j=1:m
     fig = figure('Visible','off');
     hold on;
     for kk = 1:N
-        plot(xs,dp(kk,:),'Color',[0.4, 0, 0.2, 0.4],'LineWidth',5)
+        plot(xs,dp(kk,:),'Color',[0.4, 0, 0.2, 0.4],'LineWidth',1)
     end
-    plot(xs,PxT,'Color',[0, 1, 0, 1],'LineWidth',10)
+    plot(xs,PxT,'Color',[0, 1, 0, 1],'LineWidth',2)
 
     filepath = char(strcat(dir,id,'Prof',string(j)));
     
@@ -203,7 +210,14 @@ for j=1:m
     perm = datasample(1:N,N,'Weights',w); % Setup permutation
     as_w=as(perm,:);
     dp = dp(perm,:);
-
+    % Relabel the CV matrices
+    CV_temp{N} = CV0; % Initialise matrix
+    for i = 1:N
+        CV_temp{i} = CV_1{perm(i)};
+    end
+    CV_1 = CV_temp;
+    new_states = new_states(perm);        
+        
     % Plot particle cloud
     if plot_cloud
         fig = figure('Visible','off');
@@ -220,10 +234,16 @@ for j=1:m
     l2_p(j) = (av_as(j,:)-a)*(av_as(j,:)-a)';
     disp(l2_p(j))
     disp(av_as(j,:))
-   % Mutation step
+
+    % Calculate the MSE
+    mse(j) = trace((as_w-a)'*(as_w-a));
+    disp(mse(j))
+    
+    % Mutation step
     clear as_m;
     for i=1:N
         % Compute the adaptive covariance matrix
+        
         if AM
             CV_1{i}=as_w(i,:)'*as_w(i,:)+CV_1{i};
             new_states(:,i)=as_w(i,:)'+new_states(:,i);
@@ -235,9 +255,22 @@ for j=1:m
         a2=[-1,-1,-1];
         while sum(a2<0)>0
             if j>2*k && AM
-                % Adpative Metropolis step
-                a2=(1-beta)*mvnrnd(as_w(i,:),CV{i},1)+...
-                    beta*mvnrnd(as_w(i,:),CV0,1);
+                % Adaptive Metropolis step
+                % Check to see if CV{i} is positive definite. If not,
+                % default to CV0
+                try
+                    a2=(1-beta)*mvnrnd(as_w(i,:),CV{i},1)+...
+                        beta*mvnrnd(as_w(i,:),CV0,1);
+                catch ME
+                    if (strcmp(ME.identifier,'stats:mvnrnd:BadCovariance2DSymPos'))
+                        a2 = mvnrnd(as_w(i,:),CV0,1);
+                        disp('Warning, non-positive definite covariance matrix')
+                        i
+                        CV{i}
+                    else
+                        rethrow(ME)
+                    end
+                end
             else
                 a2=mvnrnd(as_w(i,:),CV0,1);
             end
@@ -277,7 +310,8 @@ for j=1:m
         
     end      
     as=as_m;% adopt the 'mutated' particles
-   %Observe ndp datapoints
+    
+    %Observe ndp datapoints
     for i=(j*ndp+1):((j+1)*ndp)
         bin_dat(i)=randsample(1:no_b,1,true,wPT);
         index_dat(i)=randsample(1:length(xds),1,true,PTs(bin_dat(i),:));%Record the index
@@ -312,6 +346,16 @@ ylabel 'Weight of particles after observing data'
 grid on;
 
 filepath = char(strcat(dir,id,'weight'));
+
+saveas(fig,filepath,'epsc');
+
+fig = figure();
+plot(1:m,mse);
+xlabel 'iteration';
+ylabel 'MSE of particles'
+grid on;
+
+filepath = char(strcat(dir,id,'MSE'));
 
 saveas(fig,filepath,'epsc');
 
