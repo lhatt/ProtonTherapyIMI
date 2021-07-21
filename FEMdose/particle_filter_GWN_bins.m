@@ -6,9 +6,9 @@
 % applying the Adaptive Metropolis technique.
 
 clear all;
-N = 200;%No. of particles
+N = 100;%No. of particles
 ndp = 1000;%No. of data points observed
-m = 20;%No. of iterations
+m = 10;%No. of iterations
 h = 0.2; %vertical distance from gamma particle origin (x) to detector 
 no_b=6;%no. of bins/compartments for angle ranges
 global max_iterations

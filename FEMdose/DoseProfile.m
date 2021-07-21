@@ -73,3 +73,5 @@ XYZ_det=XYZ(index,:);
 
 x=0:.001:1;
 y=interp1(XYZ_det(:,1),XYZ_det(:,3),x);
+
+y = y/trapz(x,y); % Normalise to a probability density.
