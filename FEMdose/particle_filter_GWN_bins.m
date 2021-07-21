@@ -216,7 +216,7 @@ for j=1:m
         CV_temp{i} = CV_1{perm(i)};
     end
     CV_1 = CV_temp;
-    new_states = new_states(perm);        
+    new_states = new_states(:,perm);        
         
     % Plot particle cloud
     if plot_cloud
@@ -232,11 +232,14 @@ for j=1:m
     end    
     % Calculate the L2 error
     l2_p(j) = (av_as(j,:)-a)*(av_as(j,:)-a)';
+    disp('L2 error in mean')
     disp(l2_p(j))
+    disp('Average values of parameters')
     disp(av_as(j,:))
 
     % Calculate the MSE
-    mse(j) = trace((as_w-a)'*(as_w-a));
+    mse(j) = trace((as_w-a)'*(as_w-a))/N;
+    disp('Mean Squared Error of Particles')
     disp(mse(j))
     
     % Mutation step
