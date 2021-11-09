@@ -1,0 +1,83 @@
+\documentclass[lettersize,journal]{IEEEtran}
+\usepackage{amsmath,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{array}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{cite}
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
+% updated with editorial comments 8/9/2021
+
+\begin{document}
+
+\title{A Bayesian Inverse Approach to Proton Therapy Verification}
+
+\author{Alexander M.~G.~Cox, Laura Hattam, Tristan Pryer, Andreas E. Kyprianou 
+        % <-this % stops a space
+\thanks{IMI, Maths, Bath}% <-this % stops a space
+%\thanks{Manuscript received April 19, 2021; revised August 16, 2021.}
+}
+
+% The paper headers
+% \markboth{Journal of \LaTeX\ Class Files,~Vol.~14, No.~8, August~2021}%
+% {Shell \MakeLowercase{\textit{et al.}}: A Sample Article Using IEEEtran.cls for IEEE Journals}
+
+% \IEEEpubid{0000--0000/00\$00.00~\copyright~2021 IEEE}
+% Remember, if you use this you must call \IEEEpubidadjcol in the second
+% column for its text to clear the IEEEpubid mark.
+
+\maketitle
+
+\begin{abstract}
+We describe a novel approach to Bayesian Inverse methods for Proton
+Therapy verification.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Proton Therapy, Particle Filters, Bayesian Inverse Problem, \dots
+\end{IEEEkeywords}
+
+\section{Introduction}
+In this paper we describe a method to provide verification for successful delivery of Proton Therapy. In Proton Therapy, unlike other radiative treatments such as X-ray therapy, energy is delivered to the treatment site via protons. The strength of using Protons as a delivery mechanism is that all the particles energy will be deposited at or near the target area, however a consequence is that essentially all the protons are absorbed by the body, and it is hard to verify that the treatment has been successful because there is no pass-through radiation to measure.
+
+It has been suggested that treatment verification could instead occur by measuring the emitted \emph{brehmstallung} radiation emitted from the patient. As the protons are slowed through collision with other particles, they may emit some of their energy in the form of $\gamma$-radiation. The suggestion is to measure the emitted $\gamma$-radiation in order to verify that the treatment has successfully delivered the required dose to the target site. Since the location of the emitted particles is a complex function of the environment that the particles pass through, which is typically not completely known during the treatment due to the limitations of e.g. MRI scans used to plan the treatment. As a result, determining whether the radiation measured during treatment is consistent with successful dose delivery becomes a complex inverse problem.
+
+\section{Forward Model}
+
+Our starting point is to build a satisfactory forward model, that is, we describe how a given physical setting (patient configuration), will drive the proton transport, and ultimately the observed $\gamma$-radiation.
+
+{\bf TODO:}
+\begin{enumerate}
+\item Describe the NTE-equivalent we want to use!
+\item Numerical solution?
+\item Describe the mapping from proton decay to $\gamma$-creation to detection.
+\end{enumerate}
+
+
+\section{Bayesian Inverse Problem}
+
+Establish the basic problem. Suppose there is a prior on the underlying physical geometry. We need to convert this into a posterior given the data we observe. We may want to discuss here a little more the formulation of a prior.
+
+\section{KL-based approach to model discrimination}
+
+Consider a simplified version of the problem: we want to discriminate between just two possible physical arrangements. How much data do we need in order to do this? An argument via KL distances can provide us with an answer. By considering two geometries that we may want to distinguish, we can in fact give estimates on the necessary quality of the detector setup that we would need.
+
+\section{Particle Filtering Approach}
+
+Explain the particle filtering methods and Metropolis-Hastings methods we have developed to solve the inverse problem.
+
+\section{Numerical results}
+
+\end{document}
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
