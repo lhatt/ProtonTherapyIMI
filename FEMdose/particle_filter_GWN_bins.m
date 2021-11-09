@@ -6,7 +6,7 @@
 % applying the Adaptive Metropolis technique.
 
 clear all;
-N = 100;%No. of particles
+N = 50;%No. of particles
 ndp = 1000;%No. of data points observed
 m = 10;%No. of iterations
 h = 0.2; %vertical distance from gamma particle origin (x) to detector 
@@ -28,7 +28,7 @@ diary on
 plot_cloud = true;
 
 % Set to true if using adaptive covariance matrix for mutation step
-AM = true;
+AM = false;
 
 % Find the true statistic
 %Divide the domain into 3 chunks
@@ -211,12 +211,14 @@ for j=1:m
     as_w=as(perm,:);
     dp = dp(perm,:);
     % Relabel the CV matrices
-    CV_temp{N} = CV0; % Initialise matrix
-    for i = 1:N
-        CV_temp{i} = CV_1{perm(i)};
+    if AM
+        CV_temp{N} = CV0; % Initialise matrix
+        for i = 1:N
+            CV_temp{i} = CV_1{perm(i)};
+        end
+        CV_1 = CV_temp;
+        new_states = new_states(:,perm);
     end
-    CV_1 = CV_temp;
-    new_states = new_states(:,perm);        
         
     % Plot particle cloud
     if plot_cloud
